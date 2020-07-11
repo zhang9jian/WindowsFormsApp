@@ -13,6 +13,7 @@ namespace Faker
     public partial class FakerDlg : Form
     {
         public int i;
+        private int j;
         private IPAddress ipAddr;
         private IPEndPoint ipEnd;
         private Socket socket;
