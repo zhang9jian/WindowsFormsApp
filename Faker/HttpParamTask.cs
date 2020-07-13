@@ -1,14 +1,17 @@
 ﻿using System;
-using System.IO;
-using System.Net;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Net;
+using System.Net.Sockets;
+using System.IO;
 
 namespace Faker
 {
-    internal class HttpParamTask : TaskExecuter
+    class HttpParamTask:TaskExecuter
     {
-        private string uri;
-        private string sendMsg;
+        string uri;
+        string sendMsg;
 
         public HttpParamTask(HttpParamTaskInfo hi)
         {
@@ -21,10 +24,9 @@ namespace Faker
             string strResponse = doPost(uri, sendMsg);
             return strResponse;
         }
-
         //http参数报文
         public string doPost(string url, string content)
-        {
+        {            
             string result = "";
             try
             {
@@ -51,9 +53,7 @@ namespace Faker
                 {
                     result = reader.ReadToEnd();
                 }
-            }
-            catch (Exception e)
-            {
+            }catch(Exception e){
                 result = e.Message;
             }
             return result;

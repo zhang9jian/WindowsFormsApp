@@ -1,6 +1,11 @@
-﻿namespace Faker
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Faker
 {
-    internal interface TaskExecuter
+    interface TaskExecuter
     {
         string execute();
     }

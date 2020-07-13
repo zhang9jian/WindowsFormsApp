@@ -1,21 +1,24 @@
-﻿using IBM.WMQ;
-using System;
-using System.Runtime.InteropServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using IBM.WMQ.PCF;
+using IBM.WMQ;
 namespace Faker
 {
-    internal class MQTask : TaskExecuter
+    class MQTask : TaskExecuter
     {
-        private static MQQueueManager qMgr;
-        private static MQQueue queue;
-        private static string qmgrName;
-        private static string queueName;
-        private string sendMsg;
-        private bool msgMode;
-
+        static MQQueueManager qMgr;
+        static MQQueue queue;
+        static string qmgrName;
+        static string queueName;
+        string sendMsg;
+        bool msgMode;
         [DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
+
 
         public MQTask(MQTaskInfo mi)
         {
@@ -23,16 +26,18 @@ namespace Faker
             msgMode = mi.msgMode;
         }
 
+       
         //MQ通讯
         public string execute()
-        {
+        {            
             try
             {
                 initMQEnvironment();
+
             }
             catch (Exception ex)
             {
-                return "初始化MQ环境失败：" + ex.Message;
+               return "初始化MQ环境失败：" + ex.Message;
             }
             if (msgMode)
             {
@@ -41,6 +46,7 @@ namespace Faker
             }
             else
             {
+               
                 string result = sendMessage(sendMsg, queueName);
                 return result;
             }
@@ -61,7 +67,7 @@ namespace Faker
             qMgr = new MQQueueManager(qmgrName);
         }
 
-        private string sendMessage(string message, string queueName)
+        string sendMessage(string message, string queueName)
         {
             try
             {
@@ -69,7 +75,7 @@ namespace Faker
             }
             catch (MQException e)
             {
-                return ("打开队列失败：" + e.Message);
+               return ("打开队列失败：" + e.Message);
             }
             var mqMsg = new MQMessage();
             mqMsg.WriteString(message);
@@ -77,7 +83,7 @@ namespace Faker
             try
             {
                 queue.Put(mqMsg, putOptions);
-                return ("消息放置完毕");
+               return ("消息放置完毕");
             }
             catch (MQException mqe)
             {
@@ -88,14 +94,17 @@ namespace Faker
                 try
                 {
                     qMgr.Disconnect();
+
                 }
                 catch (MQException e)
                 {
+
                 }
             }
+
         }
 
-        private string getMessage(string queueName)
+        string getMessage(string queueName)
         {
             try
             {
@@ -114,19 +123,23 @@ namespace Faker
             }
             catch (MQException mqe)
             {
-                // return ("获取异常终止：" + mqe.Message);
+               // return ("获取异常终止：" + mqe.Message);
             }
             finally
             {
                 try
                 {
                     qMgr.Disconnect();
+
                 }
                 catch (MQException e)
                 {
+
                 }
+
             }
             return "";
+
         }
 
         public static string GetConfigPara(string field, string Key, string filepath)
@@ -135,5 +148,6 @@ namespace Faker
             int i = GetPrivateProfileString(field, Key, "", temp, 500, filepath);
             return temp.ToString();
         }
+
     }
 }

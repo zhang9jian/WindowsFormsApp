@@ -1,41 +1,46 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 using System.Xml;
+
+using System.Threading;
+
 
 namespace Faker
 {
     public partial class FakerDlg : Form
     {
-        private IPAddress ipAddr;
-        private IPEndPoint ipEnd;
-        private Socket socket;
-        private DateTime dtStart, dtEnd;
+        IPAddress ipAddr;
+        IPEndPoint ipEnd;
+        Socket socket;
+        DateTime dtStart,dtEnd;
         public bool bStopLoop = false;
-        public bool bSingleMode = true;
-
+        public bool bSingleMode = true; 
         public delegate void RichTextDelegate(string text);
-
         public delegate bool GetStopSignal();
 
         public RichTextDelegate richTextDelegate;
-        private GetStopSignal getStopSignal;
+        private GetStopSignal getStopSignal; 
 
         public FakerDlg()
         {
             InitializeComponent();
-            richTextDelegate = delegate (string text)
+            richTextDelegate = delegate(string text)
             {
                 this.rcRecvText.AppendText(text + "\r\n");
-                notifyProgressBar();
+                notifyProgressBar();               
                 rcRecvText.ScrollToCaret();
             };
-            getStopSignal = delegate ()
+            getStopSignal = delegate()
             {
                 if (bStopLoop == true)
                     return true;
@@ -43,7 +48,6 @@ namespace Faker
                     return false;
             };
         }
-
         private void notifyProgressBar()
         {
             if (bSingleMode) return;
@@ -58,13 +62,16 @@ namespace Faker
                 TimeSpan tsp = DateTime.Now.Subtract(dtStart);
                 toolStripEclipseTime.Text += " 共耗时：" + tsp.Seconds.ToString() + "秒";
                 MessageBox.Show("完成发送，共发送交易笔数" + Convert.ToString(toolStripProgressBar1.Maximum));
-            }
-        }
+             }
 
+        }
         //发送报文
         private void sendBtn_Click(object sender, EventArgs e)
         {
-            if (checkServerParam() == false)
+            bSingleMode = true;
+            startTask(1);
+            /*
+             * if (checkServerParam() == false)
                 return;
             try
             {
@@ -86,25 +93,21 @@ namespace Faker
                         tasker = new FixedHeadTask(fixedHeadTaskInfo);
                         recvMsg = tasker.execute();
                         break;
-
                     case "定长字节":
                         FixedByteTaskInfo fixedByteTaskInfo = new FixedByteTaskInfo(ip, port, sendMsg, isGBK, msgHeadLen);
                         tasker = new FixedByteTask(fixedByteTaskInfo);
                         recvMsg = tasker.execute();
                         break;
-
                     case "不定长字节":
                         ByteTaskInfo byteTaskInfo = new ByteTaskInfo(ip, port, sendMsg, isGBK);
                         tasker = new ByteTask(byteTaskInfo);
                         recvMsg = tasker.execute();
                         break;
-
                     case "HTTP参数":
                         HttpParamTaskInfo httpParamTaskInfo = new HttpParamTaskInfo(uri, sendMsg);
                         tasker = new HttpParamTask(httpParamTaskInfo);
                         recvMsg = tasker.execute();
                         break;
-
                     case "MQ报文":
                         MQTaskInfo mqTaskInfo = new MQTaskInfo(sendMsg, msgMode);
                         tasker = new MQTask(mqTaskInfo);
@@ -118,7 +121,7 @@ namespace Faker
             {
                 MessageBox.Show("连接失败，失败原因：" + ex.Message);
                 return;
-            }
+            }*/
         }
 
         //检查服务器端连接参数  //todo 还需要看看uri可用性
@@ -169,7 +172,6 @@ namespace Faker
             rcRecvText.Clear();
             lbStatus.Text = "清空完毕";
         }
-
         //初始化对话框
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -183,7 +185,6 @@ namespace Faker
             Image lboy = Properties.Resources.lboy;
             pictureBox1.Image = lboy;
         }
-
         //socket连接服务器
         public Socket connectSocket()
         {
@@ -192,13 +193,12 @@ namespace Faker
                 string ip = cbxIPAddress.Text.Trim();
                 int port = Convert.ToInt32(txtPort.Text.Trim());
                 ipAddr = IPAddress.Parse(ip);//接收端所在IP
-                ipEnd = new IPEndPoint(ipAddr, port);//接收端所监听的接口
+                ipEnd = new IPEndPoint(ipAddr, port);//接收端所监听的接口            
                 socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);//初始化一个Socket对象
                 socket.Connect(ipEnd);
             }
             return socket;
         }
-
         //关闭socket
         private void closeSocket()
         {
@@ -209,7 +209,6 @@ namespace Faker
                 socket = null;
             }
         }
-
         //关闭对话框
         private void btnClose_Click(object sender, EventArgs e)
         {
@@ -220,7 +219,6 @@ namespace Faker
             }
             Close();
         }
-
         //打开文件
         private void btnOpen_Click(object sender, EventArgs e)
         {
@@ -239,8 +237,9 @@ namespace Faker
                 if (en.EncodingName.IndexOf("GB") > 0)
                     rdBtnGBK.Select();
             }
-        }
 
+
+        }
         //保存消息
         private void btnSave_Click(object sender, EventArgs e)
         {
@@ -271,21 +270,18 @@ namespace Faker
                 lbStatus.Text = "保存完毕";
             }
         }
-
         //更改文本编码GBK
         private void rdbtnGBK_MouseClick(object sender, MouseEventArgs e)
         {
             rcSendText.Text = EncodingType.UTF8ToGBK(rcSendText.Text.Trim());
             rcSendText.Update();
         }
-
         //更改文件编码为u8
         private void rdBtnU8_MouseClick(object sender, MouseEventArgs e)
         {
             rcSendText.Text = EncodingType.GBKToUTF8(rcSendText.Text.Trim());
             rcSendText.Update();
         }
-
         //更改通讯类型
         private void cbxCommType_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -293,7 +289,7 @@ namespace Faker
             chkMQMode.Checked = false;
             if (cbxCommType.SelectedIndex == 0)
             {
-                cbxMsgType.Items.AddRange(new string[] { "整型定长", "定长字节", "不定长字节" });
+                cbxMsgType.Items.AddRange(new string[] { "整型定长", "定长字节","不定长字节" });
                 chkMQMode.Enabled = false;
             }
             if (cbxCommType.SelectedIndex == 1)
@@ -307,8 +303,8 @@ namespace Faker
                 chkMQMode.Enabled = true;
             }
             cbxMsgType.SelectedIndex = 0;
-        }
 
+        }
         //设置定长字节报文头长度
         private void txtMsgHeadLength_MouseClick(object sender, MouseEventArgs e)
         {
@@ -316,7 +312,6 @@ namespace Faker
             txtMsgHeadLength.ForeColor = Color.Black;
             lbStatus.Text = "定长字节报文头长度，单位字节";
         }
-
         //更改消息类型
         private void cbxMsgType_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -352,8 +347,8 @@ namespace Faker
             {
                 lbStatus.Text = "";
             }
-        }
 
+        }
         //控制报文头长度只能为数字
         private void txtMsgHeadLength_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -361,8 +356,8 @@ namespace Faker
                 e.Handled = true;
             if (e.KeyChar == (char)13)
                 SendKeys.Send("{Tab}");
-        }
 
+        }
         //关闭对话框
         private void frmSimDlg_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -385,20 +380,18 @@ namespace Faker
                 e.Cancel = true;
             }
         }
-
         //控制文本框回车改为tab
         private void keyTab(KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)13)
                 SendKeys.Send("{Tab}");
-        }
 
+        }
         //控制文本框回车改为tab
         private void txtPort_KeyPress(object sender, KeyPressEventArgs e)
         {
             keyTab(e);
         }
-
         //控制文本框回车改为tab
         private void txtURI_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -431,6 +424,7 @@ namespace Faker
                 mstream.Close();
                 rcSendText.Text = strReturn;
             }
+
         }
 
         //连接测试
@@ -451,7 +445,6 @@ namespace Faker
                         MessageBox.Show("连接成功");
                         lbStatus.Text = "连接成功";
                         break;
-
                     default:
                         MessageBox.Show("连接测试仅限于Socket方式");
                         break;
@@ -489,29 +482,37 @@ namespace Faker
                 toolStripProgressBar1.Value = 0;
                 dtStart = DateTime.Now;
                 toolStripProgressBar1.Maximum = Convert.ToInt32(cbxThreadCount.Text);
-                startMultiTaskThread();
+                long count = Int32.Parse(cbxThreadCount.Text.Trim());
+                startTask(count);
             }
             else
             {
                 bStopLoop = true;
                 btnMultiTask.Text = "开始循环";
             }
+
         }
 
-        public void startMultiTaskThread()
+        public void startTask(long count)
         {
             string msgType = cbxMsgType.Text.Trim();
-            int count = Int32.Parse(cbxThreadCount.Text.Trim());
+            /*int count;
+            if (taskMode)  //true:发送一次
+            {
+                count = 1;
+            }
+            else
+            {
+                count = Int32.Parse(cbxThreadCount.Text.Trim());
+            }*/
             if (msgType.Equals("整型定长"))
             {
                 FixedHeadTaskInfo fixedHeadTasknfo = new FixedHeadTaskInfo(cbxIPAddress.Text.Trim(), txtPort.Text.Trim(), rcSendText.Text.Trim(), rdBtnGBK.Checked);
-                //启动工作者线程
-                for (int i = 0; i < count; i++)//不能在这里终止，循环速度太快。所以在子线程里判断状态
-                {
-                    ThreadPool.QueueUserWorkItem(new WaitCallback(FixedHeadTaskWorkerThread), fixedHeadTasknfo);
-                }
-            }
-            if (msgType.Equals("定长字节"))
+               //启动工作者线程
+               for (int i = 0; i < count; i++)//不能在这里终止，循环速度太快。所以在子线程里判断状态
+                 ThreadPool.QueueUserWorkItem(new WaitCallback(FixedHeadTaskWorkerThread), fixedHeadTasknfo);
+             }
+            else if (msgType.Equals("定长字节"))
             {
                 FixedByteTaskInfo fixedByteTasknfo = new FixedByteTaskInfo(cbxIPAddress.Text.Trim(), txtPort.Text.Trim(), rcSendText.Text.Trim(), rdBtnGBK.Checked, txtMsgHeadLength.Text.Trim());
                 //启动工作者线程
@@ -519,22 +520,21 @@ namespace Faker
                     ThreadPool.QueueUserWorkItem(new WaitCallback(FixedByteTaskWorkerThread), fixedByteTasknfo);
             }
 
-            if (msgType.Equals("不定长字节"))
+            else if (msgType.Equals("不定长字节"))
             {
                 ByteTaskInfo byteTasknfo = new ByteTaskInfo(cbxIPAddress.Text.Trim(), txtPort.Text.Trim(), rcSendText.Text.Trim(), rdBtnGBK.Checked);
                 //启动工作者线程
                 for (int i = 0; i < count; i++)
                     ThreadPool.QueueUserWorkItem(new WaitCallback(byteTaskWorkerThread), byteTasknfo);
             }
-
-            if (msgType.Equals("HTTP参数"))
+            else if (msgType.Equals("HTTP参数"))
             {
                 HttpParamTaskInfo httpParamTaskInfo = new HttpParamTaskInfo(txtURI.Text.Trim(), rcSendText.Text.Trim());
                 //启动工作者线程
                 for (int i = 0; i < count; i++)
                     ThreadPool.QueueUserWorkItem(new WaitCallback(HttpParamTaskWorkerThread), httpParamTaskInfo);
             }
-            if (msgType.Equals("MQ报文"))
+            else if (msgType.Equals("MQ报文"))
             {
                 MQTaskInfo mqTaskInfo = new MQTaskInfo(rcSendText.Text.Trim(), chkMQMode.Checked);
                 //启动工作者线程
@@ -551,7 +551,6 @@ namespace Faker
             bool bStopLoop = (bool)this.EndInvoke(isr);
             return bStopLoop;
         }
-
         private void FixedHeadTaskWorkerThread(object obj)
         {
             if (stopLoop()) return;
@@ -587,6 +586,7 @@ namespace Faker
             Thread.Sleep(1000);
         }
 
+
         private void HttpParamTaskWorkerThread(object obj)
         {
             if (stopLoop()) return;
@@ -616,6 +616,8 @@ namespace Faker
             Text = Text.Substring(1) + Text.Substring(0, 1);
         }
 
+       
+
         private void pictureBox1_MouseEnter(object sender, EventArgs e)
         {
             Image lgirl = Properties.Resources.lgirl;
@@ -635,6 +637,7 @@ namespace Faker
         public string port;
         public string sendMsg;
         public bool isGBK;
+
 
         public FixedHeadTaskInfo(string _ip, string _port, string _msg, bool _isGBK)
         {
@@ -670,6 +673,7 @@ namespace Faker
         public string sendMsg;
         public bool isGBK;
 
+
         public ByteTaskInfo(string _ip, string _port, string _msg, bool _isGBK)
         {
             ip = _ip;
@@ -695,7 +699,6 @@ namespace Faker
     {
         public string sendMsg;
         public bool msgMode;
-
         public MQTaskInfo(string _sendMsg, bool _msgMode)
         {
             sendMsg = _sendMsg;

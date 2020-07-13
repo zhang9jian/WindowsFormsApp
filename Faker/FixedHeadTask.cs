@@ -1,20 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace Faker
 {
-    internal class FixedHeadTask : TaskExecuter
+    class FixedHeadTask : TaskExecuter
     {
-        private IPAddress ipAddr;
-        private IPEndPoint ipEnd;
-        private Socket socket;
-        private string IP;
-        private string Port;
-        private string sendMsg;
-        private bool isGBK;
+        IPAddress ipAddr;
+        IPEndPoint ipEnd;
+        Socket socket;
+        string IP;
+        string Port;
+        string sendMsg;
+        bool isGBK;
 
         public FixedHeadTask(FixedHeadTaskInfo si)
         {
@@ -30,12 +31,12 @@ namespace Faker
             byte[] arrSendMessage = new byte[1024];
             if (isGBK)
             {
-                arrSendMessage = Encoding.Default.GetBytes(strSendMessage); //消息字节数组  //GBK字节数组
+                arrSendMessage = Encoding.Default.GetBytes(strSendMessage); //消息字节数组  //GBK字节数组     
             }
             else
             //  if (!isGBK)
             {
-                arrSendMessage = Encoding.UTF8.GetBytes(strSendMessage); //消息字节数组  //GBK字节数组
+                arrSendMessage = Encoding.UTF8.GetBytes(strSendMessage); //消息字节数组  //GBK字节数组     
             }
 
             byte[] arrSendMessageHeadLWord = new byte[4];//定义消息头字节长度
@@ -54,24 +55,23 @@ namespace Faker
 
             if (!isGBK)
             {
-                arrSendMessage = Encoding.UTF8.GetBytes(strSendMessage); //消息字节数组  //GBK字节数组
+                arrSendMessage = Encoding.UTF8.GetBytes(strSendMessage); //消息字节数组  //GBK字节数组     
             }
 
             string recvMsg = "";
             if (isGBK)
             {
-                recvMsg = Encoding.Default.GetString(arrRecvMessage, 0, arrRecvMessage.Length); //消息字节数组  //GBK字节数组
+                recvMsg = Encoding.Default.GetString(arrRecvMessage, 0, arrRecvMessage.Length); //消息字节数组  //GBK字节数组     
             }
             else
             {
-                recvMsg = Encoding.UTF8.GetString(arrRecvMessage, 0, arrRecvMessage.Length); //消息字节数组  //GBK字节数组
+                recvMsg = Encoding.UTF8.GetString(arrRecvMessage, 0, arrRecvMessage.Length); //消息字节数组  //GBK字节数组     
             }
             return recvMsg.Trim();
         }
-
         public string execute()
         {
-            connectSocket(IP, Port);
+            connectSocket(IP,Port);
             string recvMsg = comm();
             closeSocket();
             return recvMsg;
@@ -84,13 +84,12 @@ namespace Faker
                 string ip = strIP.Trim();
                 int port = Convert.ToInt32(strPort.Trim());
                 ipAddr = IPAddress.Parse(ip);//接收端所在IP
-                ipEnd = new IPEndPoint(ipAddr, port);//接收端所监听的接口
+                ipEnd = new IPEndPoint(ipAddr, port);//接收端所监听的接口            
                 socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);//初始化一个Socket对象
                 socket.Connect(ipEnd);
             }
             return socket;
         }
-
         //关闭socket
         private void closeSocket()
         {
@@ -101,5 +100,6 @@ namespace Faker
                 socket = null;
             }
         }
+        
     }
 }
