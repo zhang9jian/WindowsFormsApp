@@ -69,59 +69,7 @@ namespace Faker
         private void sendBtn_Click(object sender, EventArgs e)
         {
             bSingleMode = true;
-            startTask(1);
-            /*
-             * if (checkServerParam() == false)
-                return;
-            try
-            {
-                string ip = cbxIPAddress.Text.Trim();
-                string port = txtPort.Text.Trim();
-                string sendMsg = rcSendText.Text.Trim();
-                bool isGBK = rdBtnGBK.Checked;
-                string msgHeadLen = txtMsgHeadLength.Text.Trim();
-                string uri = txtURI.Text.Trim();
-                bool msgMode = chkMQMode.Checked;//取消息true;
-                string recvMsg = "";
-                bSingleMode = true;
-                TaskExecuter tasker;
-
-                switch (cbxMsgType.Text)
-                {
-                    case "整型定长":
-                        FixedHeadTaskInfo fixedHeadTaskInfo = new FixedHeadTaskInfo(ip, port, sendMsg, isGBK);
-                        tasker = new FixedHeadTask(fixedHeadTaskInfo);
-                        recvMsg = tasker.execute();
-                        break;
-                    case "定长字节":
-                        FixedByteTaskInfo fixedByteTaskInfo = new FixedByteTaskInfo(ip, port, sendMsg, isGBK, msgHeadLen);
-                        tasker = new FixedByteTask(fixedByteTaskInfo);
-                        recvMsg = tasker.execute();
-                        break;
-                    case "不定长字节":
-                        ByteTaskInfo byteTaskInfo = new ByteTaskInfo(ip, port, sendMsg, isGBK);
-                        tasker = new ByteTask(byteTaskInfo);
-                        recvMsg = tasker.execute();
-                        break;
-                    case "HTTP参数":
-                        HttpParamTaskInfo httpParamTaskInfo = new HttpParamTaskInfo(uri, sendMsg);
-                        tasker = new HttpParamTask(httpParamTaskInfo);
-                        recvMsg = tasker.execute();
-                        break;
-                    case "MQ报文":
-                        MQTaskInfo mqTaskInfo = new MQTaskInfo(sendMsg, msgMode);
-                        tasker = new MQTask(mqTaskInfo);
-                        recvMsg = tasker.execute();
-                        break;
-                }
-                richTextDelegate(recvMsg);
-                lbStatus.Text = "发送完毕";
-            }
-            catch (SocketException ex)
-            {
-                MessageBox.Show("连接失败，失败原因：" + ex.Message);
-                return;
-            }*/
+            startTask(1);           
         }
 
         //检查服务器端连接参数  //todo 还需要看看uri可用性
